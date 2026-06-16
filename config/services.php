@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'mobilipa' => [
+        'api_key' => env('MOBILIPA_API_KEY', 'sk_live_YN0RUW4o2EQ3SxLNOiyyj25Ldfs37KyBHk1GSbda'),
+        'base_url' => env('MOBILIPA_BASE_URL', 'https://api.mobilipa.store'),
+    ],
+
 ];

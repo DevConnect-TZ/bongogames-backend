@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Database\Factories\GameFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[Fillable(['title', 'developer_id', 'category_id', 'price', 'description', 'cover_path', 'thumbnail_path', 'trailer_url', 'status'])]
 class Game extends Model
 {
     /** @use HasFactory<GameFactory> */

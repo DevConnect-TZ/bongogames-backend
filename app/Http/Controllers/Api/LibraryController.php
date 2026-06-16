@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Game;
 use App\Models\Purchase;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 
 class LibraryController extends Controller
@@ -20,12 +20,20 @@ class LibraryController extends Controller
         return response()->json($purchases);
     }
 
-    public function purchase(Game $game): JsonResponse
+    public function completePurchase(Transaction $transaction): JsonResponse
     {
         $user = request()->user();
 
+        if ($transaction->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if ($transaction->payment_status !== 'COMPLETED') {
+            return response()->json(['message' => 'Payment not yet completed.'], 422);
+        }
+
         $alreadyOwned = Purchase::where('user_id', $user->id)
-            ->where('game_id', $game->id)
+            ->where('game_id', $transaction->game_id)
             ->exists();
 
         if ($alreadyOwned) {
@@ -34,8 +42,8 @@ class LibraryController extends Controller
 
         Purchase::create([
             'user_id' => $user->id,
-            'game_id' => $game->id,
-            'price_paid' => $game->price,
+            'game_id' => $transaction->game_id,
+            'price_paid' => $transaction->amount,
         ]);
 
         return response()->json(['message' => 'Game purchased successfully.'], 201);
