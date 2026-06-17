@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminStoreDeveloperRequest;
 use App\Http\Requests\AdminStoreUserRequest;
+use App\Http\Requests\AdminUpdateDeveloperRequest;
 use App\Http\Requests\AdminUpdateUserRequest;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
@@ -119,7 +121,7 @@ class AdminController extends Controller
         return response()->json($developers);
     }
 
-    public function storeDeveloper(AdminStoreUserRequest $request): JsonResponse
+    public function storeDeveloper(AdminStoreDeveloperRequest $request): JsonResponse
     {
         $developer = User::create([
             'name' => $request->username,
@@ -134,7 +136,7 @@ class AdminController extends Controller
         return response()->json($developer, 201);
     }
 
-    public function updateDeveloper(AdminUpdateUserRequest $request, User $developer): JsonResponse
+    public function updateDeveloper(AdminUpdateDeveloperRequest $request, User $developer): JsonResponse
     {
         if ($developer->role !== 'developer') {
             return response()->json(['message' => 'User is not a developer.'], 422);
