@@ -119,6 +119,38 @@ class AdminController extends Controller
         return response()->json($developers);
     }
 
+    public function storeDeveloper(AdminStoreUserRequest $request): JsonResponse
+    {
+        $developer = User::create([
+            'name' => $request->username,
+            'username' => $request->username,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => $request->password,
+            'role' => 'developer',
+            'bio' => $request->bio,
+        ]);
+
+        return response()->json($developer, 201);
+    }
+
+    public function updateDeveloper(AdminUpdateUserRequest $request, User $developer): JsonResponse
+    {
+        if ($developer->role !== 'developer') {
+            return response()->json(['message' => 'User is not a developer.'], 422);
+        }
+
+        $data = $request->validated();
+
+        if (isset($data['username'])) {
+            $data['name'] = $data['username'];
+        }
+
+        $developer->update($data);
+
+        return response()->json($developer);
+    }
+
     public function deleteDeveloper(User $developer): JsonResponse
     {
         if ($developer->role !== 'developer') {

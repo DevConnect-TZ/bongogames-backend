@@ -79,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('users/{user}', [AdminController::class, 'deleteUser']);
 
         Route::get('developers', [AdminController::class, 'developers']);
+        Route::post('developers', [AdminController::class, 'storeDeveloper']);
+        Route::put('developers/{developer}', [AdminController::class, 'updateDeveloper']);
         Route::delete('developers/{developer}', [AdminController::class, 'deleteDeveloper']);
 
         Route::get('sales', [AdminController::class, 'sales']);
