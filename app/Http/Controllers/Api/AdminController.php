@@ -71,9 +71,12 @@ class AdminController extends Controller
 
     public function storeUser(AdminStoreUserRequest $request): JsonResponse
     {
+        $email = $request->email ?: $this->generateEmail($request->username);
+
         $user = User::create([
             'name' => $request->username,
             'username' => $request->username,
+            'email' => $email,
             'phone' => $request->phone,
             'password' => $request->password,
             'role' => $request->role,
@@ -81,6 +84,25 @@ class AdminController extends Controller
         ]);
 
         return response()->json($user, 201);
+    }
+
+    private function generateEmail(string $username): string
+    {
+        $base = strtolower(preg_replace('/[^a-z0-9_-]/', '', $username));
+
+        if ($base === '') {
+            $base = 'user'.time();
+        }
+
+        $email = $base.'@bongogames.local';
+
+        $counter = 1;
+        while (User::where('email', $email)->exists()) {
+            $email = $base.'.'.$counter.'@bongogames.local';
+            $counter++;
+        }
+
+        return $email;
     }
 
     public function updateUser(AdminUpdateUserRequest $request, User $user): JsonResponse
@@ -123,10 +145,12 @@ class AdminController extends Controller
 
     public function storeDeveloper(AdminStoreDeveloperRequest $request): JsonResponse
     {
+        $email = $request->email ?: $this->generateEmail($request->username);
+
         $developer = User::create([
             'name' => $request->username,
             'username' => $request->username,
-            'email' => $request->email,
+            'email' => $email,
             'phone' => $request->phone,
             'password' => $request->password,
             'role' => 'developer',

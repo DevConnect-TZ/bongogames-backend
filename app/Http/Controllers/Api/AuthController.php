@@ -15,9 +15,12 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request): JsonResponse
     {
+        $email = $this->generateEmail($request->username, $request->phone);
+
         $user = User::create([
             'name' => $request->username,
             'username' => $request->username,
+            'email' => $email,
             'phone' => $request->phone,
             'password' => $request->password,
             'role' => 'user',
@@ -29,6 +32,25 @@ class AuthController extends Controller
             'user' => $user->only(['id', 'username', 'phone', 'role']),
             'token' => $token,
         ], 201);
+    }
+
+    private function generateEmail(string $username, string $phone): string
+    {
+        $base = strtolower(preg_replace('/[^a-z0-9_-]/', '', $username)).'.'.preg_replace('/[^0-9]/', '', $phone);
+
+        if ($base === '') {
+            $base = 'user'.time();
+        }
+
+        $email = $base.'@bongogames.local';
+
+        $counter = 1;
+        while (User::where('email', $email)->exists()) {
+            $email = $base.'.'.$counter.'@bongogames.local';
+            $counter++;
+        }
+
+        return $email;
     }
 
     public function login(LoginRequest $request): JsonResponse
