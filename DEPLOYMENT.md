@@ -220,6 +220,21 @@ server {
 
     charset utf-8;
 
+    # CORS preflight for API
+    location /api/ {
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, Accept, X-Requested-With' always;
+            add_header 'Access-Control-Max-Age' 1728000 always;
+            add_header 'Content-Type' 'text/plain; charset=utf-8' always;
+            add_header 'Content-Length' 0 always;
+            return 204;
+        }
+
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
@@ -234,6 +249,11 @@ server {
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_hide_header X-Powered-By;
+
+        # Ensure response bodies are forwarded properly
+        fastcgi_buffering off;
+        fastcgi_request_buffering off;
+        fastcgi_read_timeout 300;
     }
 
     location ~ /\.(?!well-known).* {
