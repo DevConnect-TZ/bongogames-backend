@@ -22,14 +22,4 @@ return new class extends Migration
             $table->dropColumn('trailer_path');
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('games', function (Blueprint $table) {
-            //
-        });
-    }
 };
