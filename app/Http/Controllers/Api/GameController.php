@@ -49,10 +49,6 @@ class GameController extends Controller
             $game->thumbnail_path = $this->storeOptimizedImage($request->file('thumbnail'), 'thumbnails', 400, 300);
         }
 
-        if ($request->hasFile('trailer_file')) {
-            $game->trailer_path = $request->file('trailer_file')->store('trailers', 'public');
-        }
-
         $game->save();
 
         if ($request->hasFile('screenshots')) {
@@ -98,13 +94,6 @@ class GameController extends Controller
             $game->thumbnail_path = $this->storeOptimizedImage($request->file('thumbnail'), 'thumbnails', 400, 300);
         }
 
-        if ($request->hasFile('trailer_file')) {
-            if ($game->trailer_path) {
-                Storage::disk('public')->delete($game->trailer_path);
-            }
-            $game->trailer_path = $request->file('trailer_file')->store('trailers', 'public');
-        }
-
         $game->save();
 
         if ($request->hasFile('screenshots')) {
@@ -139,9 +128,6 @@ class GameController extends Controller
         }
         if ($game->thumbnail_path) {
             Storage::disk('public')->delete($game->thumbnail_path);
-        }
-        if ($game->trailer_path) {
-            Storage::disk('public')->delete($game->trailer_path);
         }
         foreach ($game->screenshots as $screenshot) {
             Storage::disk('public')->delete($screenshot->path);
