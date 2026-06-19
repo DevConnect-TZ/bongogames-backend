@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DeveloperController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\GoogleAuthController;
 use App\Http\Controllers\Api\LibraryController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
@@ -23,6 +24,7 @@ Route::get('/', function () {
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('google', [GoogleAuthController::class, 'handle']);
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
