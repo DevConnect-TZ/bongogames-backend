@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateGameRequest;
 use App\Models\Game;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class GameController extends Controller
 {
@@ -40,11 +42,15 @@ class GameController extends Controller
         ]);
 
         if ($request->hasFile('cover')) {
-            $game->cover_path = $request->file('cover')->store('covers', 'public');
+            $game->cover_path = $this->storeOptimizedImage($request->file('cover'), 'covers', 800, 450);
         }
 
         if ($request->hasFile('thumbnail')) {
-            $game->thumbnail_path = $request->file('thumbnail')->store('thumbnails', 'public');
+            $game->thumbnail_path = $this->storeOptimizedImage($request->file('thumbnail'), 'thumbnails', 400, 300);
+        }
+
+        if ($request->hasFile('trailer_file')) {
+            $game->trailer_path = $request->file('trailer_file')->store('trailers', 'public');
         }
 
         $game->save();
@@ -52,7 +58,7 @@ class GameController extends Controller
         if ($request->hasFile('screenshots')) {
             foreach ($request->file('screenshots') as $i => $file) {
                 $game->screenshots()->create([
-                    'path' => $file->store('screenshots', 'public'),
+                    'path' => $this->storeOptimizedImage($file, 'screenshots', 1280, 720),
                     'order' => $i,
                 ]);
             }
@@ -82,14 +88,21 @@ class GameController extends Controller
             if ($game->cover_path) {
                 Storage::disk('public')->delete($game->cover_path);
             }
-            $game->cover_path = $request->file('cover')->store('covers', 'public');
+            $game->cover_path = $this->storeOptimizedImage($request->file('cover'), 'covers', 800, 450);
         }
 
         if ($request->hasFile('thumbnail')) {
             if ($game->thumbnail_path) {
                 Storage::disk('public')->delete($game->thumbnail_path);
             }
-            $game->thumbnail_path = $request->file('thumbnail')->store('thumbnails', 'public');
+            $game->thumbnail_path = $this->storeOptimizedImage($request->file('thumbnail'), 'thumbnails', 400, 300);
+        }
+
+        if ($request->hasFile('trailer_file')) {
+            if ($game->trailer_path) {
+                Storage::disk('public')->delete($game->trailer_path);
+            }
+            $game->trailer_path = $request->file('trailer_file')->store('trailers', 'public');
         }
 
         $game->save();
@@ -102,7 +115,7 @@ class GameController extends Controller
 
             foreach ($request->file('screenshots') as $i => $file) {
                 $game->screenshots()->create([
-                    'path' => $file->store('screenshots', 'public'),
+                    'path' => $this->storeOptimizedImage($file, 'screenshots', 1280, 720),
                     'order' => $i,
                 ]);
             }
@@ -127,13 +140,30 @@ class GameController extends Controller
         if ($game->thumbnail_path) {
             Storage::disk('public')->delete($game->thumbnail_path);
         }
+        if ($game->trailer_path) {
+            Storage::disk('public')->delete($game->trailer_path);
+        }
         foreach ($game->screenshots as $screenshot) {
             Storage::disk('public')->delete($screenshot->path);
         }
-        // download_path is a URL, no file cleanup needed
 
         $game->delete();
 
         return response()->json(['message' => 'Game deleted.']);
+    }
+
+    private function storeOptimizedImage(UploadedFile $file, string $folder, int $maxWidth, int $maxHeight): string
+    {
+        $image = Image::read($file);
+
+        if ($image->width() > $maxWidth || $image->height() > $maxHeight) {
+            $image->scaleDown($maxWidth, $maxHeight);
+        }
+
+        $path = $folder.'/'.uniqid().'.webp';
+
+        Storage::disk('public')->put($path, $image->toWebp(quality: 80));
+
+        return $path;
     }
 }

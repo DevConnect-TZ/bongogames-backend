@@ -21,6 +21,7 @@ class StoreGameRequest extends FormRequest
             'cover' => ['nullable', 'image', 'max:5120'],
             'thumbnail' => ['nullable', 'image', 'max:2048'],
             'trailer_url' => ['nullable', 'url', 'max:500'],
+            'trailer_file' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/ogg', 'max:102400'],
             'screenshots' => ['nullable', 'array', 'max:10'],
             'screenshots.*' => ['image', 'max:5120'],
             'version' => ['required', 'string', 'max:50'],

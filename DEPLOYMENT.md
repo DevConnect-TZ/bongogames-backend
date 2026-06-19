@@ -70,9 +70,10 @@ Edit `/etc/php/8.3/fpm/php.ini` for production:
 
 ```ini
 memory_limit = 512M
-upload_max_filesize = 100M
-post_max_size = 100M
-max_execution_time = 60
+upload_max_filesize = 256M
+post_max_size = 256M
+max_execution_time = 300
+max_input_time = 300
 date.timezone = Africa/Dar_es_Salaam
 ```
 
@@ -260,7 +261,9 @@ server {
         deny all;
     }
 
-    client_max_body_size 100M;
+    client_max_body_size 256M;
+    client_body_timeout 300s;
+    client_header_timeout 300s;
 
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
