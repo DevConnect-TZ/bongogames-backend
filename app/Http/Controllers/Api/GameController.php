@@ -140,7 +140,7 @@ class GameController extends Controller
 
     private function storeOptimizedImage(UploadedFile $file, string $folder, int $maxWidth, int $maxHeight): string
     {
-        $image = Image::read($file);
+        $image = Image::decode($file);
 
         if ($image->width() > $maxWidth || $image->height() > $maxHeight) {
             $image->scaleDown($maxWidth, $maxHeight);
@@ -148,7 +148,7 @@ class GameController extends Controller
 
         $path = $folder.'/'.uniqid().'.webp';
 
-        Storage::disk('public')->put($path, $image->toWebp(quality: 80));
+        Storage::disk('public')->put($path, $image->encodeUsingFileExtension('webp', quality: 80));
 
         return $path;
     }
